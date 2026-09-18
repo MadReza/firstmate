@@ -873,18 +873,27 @@ test_ship_comment_and_doc_rule_is_ship_only() {
 }
 
 test_ship_and_scout_forbid_self_polling_on_wait() {
-  local home brief
+  local home kind id brief
   home="$TMP_ROOT/no-self-poll-home"
   mkdir -p "$home/data"
-  FM_HOME="$home" "$ROOT/bin/fm-brief.sh" no-poll-ship firstmate --mode no-mistakes >/dev/null 2>&1
-  brief="$home/data/no-poll-ship/brief.md"
-  assert_grep "wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it" "$brief" \
-    "ship brief did not forbid self-polling while parked on needs-decision/blocked/paused"
-  FM_HOME="$home" "$ROOT/bin/fm-brief.sh" no-poll-scout firstmate --scout >/dev/null 2>&1
-  brief="$home/data/no-poll-scout/brief.md"
-  assert_grep "wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it" "$brief" \
-    "scout brief did not forbid self-polling while parked on needs-decision/blocked/paused"
-  pass "fm-brief.sh: ship and scout briefs forbid self-polling while parked on a firstmate-delivered decision"
+
+  for kind in ship scout; do
+    id="no-poll-$kind"
+    if [ "$kind" = scout ]; then
+      FM_HOME="$home" FM_CLASSIFY_PAUSED_VERB=awaiting \
+        "$ROOT/bin/fm-brief.sh" "$id" firstmate --scout >/dev/null 2>&1
+    else
+      FM_HOME="$home" FM_CLASSIFY_PAUSED_VERB=awaiting \
+        "$ROOT/bin/fm-brief.sh" "$id" firstmate --mode no-mistakes >/dev/null 2>&1
+    fi
+    brief="$home/data/$id/brief.md"
+    # shellcheck disable=SC2016 # Literal backticks must remain unexpanded.
+    assert_grep 'After `needs-decision` or `blocked`, wait idle for firstmate'"'"'s reply - never poll, loop, or schedule your own wakeups to check for it.' "$brief" \
+      "$kind brief did not forbid self-polling while parked on a firstmate-delivered reply"
+    assert_no_grep "or \`awaiting\`, wait idle" "$brief" \
+      "$kind brief told a self-clearing declared wait to park for a firstmate reply that never comes"
+  done
+  pass "fm-brief.sh: ship and scout briefs park only on the states firstmate must clear"
 }
 
 # A scout brief offers the Lavish review loop only when bootstrap confirms the
