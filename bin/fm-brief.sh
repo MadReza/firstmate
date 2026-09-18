@@ -59,7 +59,13 @@
 # Every scaffold's status protocol distinguishes the configured
 # declared-external-wait verb (FM_CLASSIFY_PAUSED_VERB, default "paused") from
 # "blocked:": pause for a known external wait expected to clear on its own,
-# blocked when firstmate must act.
+# blocked when firstmate must act. After any of those states, or needs-decision,
+# the crewmate waits idle for firstmate's reply instead of polling or scheduling
+# its own wakeups. Every scaffold also forbids an agent name as a commit
+# co-author. Ship briefs additionally carry a comment/docs accident-test rule;
+# scout briefs omit it since a report is the only surviving deliverable, so
+# bin/fm-promote.sh hands it to a promoted worker with the rest of the ship
+# instructions.
 # Every scaffold also carries the steering-inbox receive-and-ack section:
 # process state/<id>.inbox/*.msg in order and acknowledge each by moving it to
 # handled/ (record, doorbell, and ladder owned by bin/fm-task-inbox-lib.sh).
@@ -396,6 +402,7 @@ The report is the only thing that survives, so anything worth keeping must be in
    treating it as a possible wedge. When you know when the wait clears, say so in the line with
    \`until <YYYY-MM-DDTHH:MMZ>\` (UTC) and firstmate rechecks at that time instead.
    Use \`blocked:\` when you are stuck and need help.
+   After \`needs-decision\`, \`blocked\`, or \`$PAUSED_VERB\`, wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it.
 5. If you hit the same obstacle twice, append \`blocked: {why}\` and stop; firstmate will help.
 6. If a decision belongs to a human (product choices, destructive actions),
    append \`needs-decision: {summary of options}\` and stop. Firstmate will reply with the decision.
@@ -413,6 +420,7 @@ The report is the only thing that survives, so anything worth keeping must be in
    going. A drive-call error, timeout, slow read, or generic unreachability is NOT a daemon error:
    the daemon accepts \`respond\` immediately and runs the round in the background, so a killed or
    timed-out call was only waiting for a read while the run kept working.
+8. Never add an agent name as a commit co-author on any commit.
 
 $INBOX_SECTION
 
@@ -484,6 +492,7 @@ $RULE1
    known external wait you expect to clear on its own ($CREWMATE_PAUSE_WAIT_EXAMPLES):
    firstmate then leaves your idle pane alone and rechecks it on a long
    cadence instead of treating it as a possible wedge. Use \`blocked:\` when you are stuck and need help.
+   After \`needs-decision\`, \`blocked\`, or \`$PAUSED_VERB\`, wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it.
 5. If you hit the same obstacle twice, append \`blocked: {why}\` and stop; firstmate will help.
 6. If a decision belongs above the implementation worker (product choices, destructive actions),
    append \`needs-decision: {summary of options}\` and stop. Firstmate will reply with the decision.
@@ -502,6 +511,8 @@ $ASK_USER_BLOCK
    going. A drive-call error, timeout, slow read, or generic unreachability is NOT a daemon error:
    the daemon accepts \`respond\` immediately and runs the round in the background, so a killed or
    timed-out call was only waiting for a read while the run kept working.
+8. Never add an agent name as a commit co-author on any commit.
+9. Rename or restructure before adding a comment; add one only where its absence would cause a mistake. Docs must never restate a fact a machine-readable file already declares.
 
 $INBOX_SECTION
 
