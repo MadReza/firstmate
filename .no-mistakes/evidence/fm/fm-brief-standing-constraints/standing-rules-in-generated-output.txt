@@ -1,0 +1,11 @@
+### ship brief (generated) — standing rules now present
+45:   After `needs-decision` or `blocked`, wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it.
+66:8. Never add an agent name as a commit co-author on any commit.
+67:9. Rename or restructure before adding a comment; add one only where its absence would cause a mistake. Docs must never restate a fact a machine-readable file already declares.
+
+### scout brief (generated) — idle-wait + co-author, no code-bearing comment rule
+40:   After `needs-decision` or `blocked`, wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it.
+58:8. Never add an agent name as a commit co-author on any commit.
+
+### promoted scout's ship instructions — comment/docs rule delivered
+16:8. Added rule your scout brief does not carry, because a report-only deliverable never needed it: Rename or restructure before adding a comment; add one only where its absence would cause a mistake. Docs must never restate a fact a machine-readable file already declares.

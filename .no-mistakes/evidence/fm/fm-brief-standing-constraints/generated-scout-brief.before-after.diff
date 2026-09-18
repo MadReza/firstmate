@@ -1,0 +1,41 @@
+--- /tmp/fmbrief.2Uhl3g/before/data/demo-scout/brief.md	2026-09-18 10:50:19
++++ /tmp/fmbrief.2Uhl3g/after/data/demo-scout/brief.md	2026-09-18 10:50:16
+@@ -23,7 +23,7 @@
+ 2. Stay inside this worktree; the only files you may write outside it are the report and the status file below.
+ 3. Use gh-axi for GitHub operations and chrome-devtools-axi for browser operations.
+ 4. Report status by appending one line:
+-   `echo "{state}: {one short line}" >> '/tmp/fmbrief.2Uhl3g/before/state/demo-scout.status'`
++   `echo "{state}: {one short line}" >> '/tmp/fmbrief.2Uhl3g/after/state/demo-scout.status'`
+    States: working, needs-decision, blocked, paused, done, failed.
+    Each append wakes firstmate, so report sparingly: only phase changes a supervisor
+    would act on and the needs-decision/blocked/paused/done/failed states. No step-by-step
+@@ -37,6 +37,7 @@
+    treating it as a possible wedge. When you know when the wait clears, say so in the line with
+    `until <YYYY-MM-DDTHH:MMZ>` (UTC) and firstmate rechecks at that time instead.
+    Use `blocked:` when you are stuck and need help.
++   After `needs-decision` or `blocked`, wait idle for firstmate's reply - never poll, loop, or schedule your own wakeups to check for it.
+ 5. If you hit the same obstacle twice, append `blocked: {why}` and stop; firstmate will help.
+ 6. If a decision belongs to a human (product choices, destructive actions),
+    append `needs-decision: {summary of options}` and stop. Firstmate will reply with the decision.
+@@ -54,16 +55,17 @@
+    going. A drive-call error, timeout, slow read, or generic unreachability is NOT a daemon error:
+    the daemon accepts `respond` immediately and runs the round in the background, so a killed or
+    timed-out call was only waiting for a read while the run kept working.
++8. Never add an agent name as a commit co-author on any commit.
+ 
+ # Firstmate instruction inbox
+-Firstmate steers you through durable message files in '/tmp/fmbrief.2Uhl3g/before/state/demo-scout.inbox'.
+-When a terminal message says an instruction is waiting there - and at any natural checkpoint when you are unsure - list '/tmp/fmbrief.2Uhl3g/before/state/demo-scout.inbox'/*.msg, read and act on each message in numeric order, then acknowledge each handled message by moving it: `mv '/tmp/fmbrief.2Uhl3g/before/state/demo-scout.inbox'/NNN.msg '/tmp/fmbrief.2Uhl3g/before/state/demo-scout.inbox'/handled/`.
++Firstmate steers you through durable message files in '/tmp/fmbrief.2Uhl3g/after/state/demo-scout.inbox'.
++When a terminal message says an instruction is waiting there - and at any natural checkpoint when you are unsure - list '/tmp/fmbrief.2Uhl3g/after/state/demo-scout.inbox'/*.msg, read and act on each message in numeric order, then acknowledge each handled message by moving it: `mv '/tmp/fmbrief.2Uhl3g/after/state/demo-scout.inbox'/NNN.msg '/tmp/fmbrief.2Uhl3g/after/state/demo-scout.inbox'/handled/`.
+ The move IS the acknowledgement: without it firstmate rings again and eventually treats you as stuck. An empty or absent inbox needs no action.
+ 
+ # Definition of done
+-Write your findings to `/tmp/fmbrief.2Uhl3g/before/data/demo-scout/report.md`.
++Write your findings to `/tmp/fmbrief.2Uhl3g/after/data/demo-scout/report.md`.
+ The report must stand alone: what you did, what you found, the evidence (commands run, output, file:line references), and what you recommend.
+ If your deliverable is a visual artifact the captain will review and iterate on, you may host the Lavish review loop yourself (poll, revise, re-serve, staying alive) instead of handing it back to firstmate.
+-Before reporting done, read and follow `/tmp/fmbrief.2Uhl3g/base/.agents/skills/captain-hold-lifecycle/SKILL.md` and pass its shared completion gate for the report and any visual review.
++Before reporting done, read and follow `/Users/reza/.no-mistakes/worktrees/a8b73e1c82e4/01M2TEFEV05VPBF4NH1B3MXJGS/.agents/skills/captain-hold-lifecycle/SKILL.md` and pass its shared completion gate for the report and any visual review.
+ When the report is complete, append `done: {one-line conclusion}` to the status file and stop.
+ If your findings reveal work that should ship (e.g. you reproduced a bug and the fix is clear), say so in the report; firstmate may promote this task in place, and you would then receive mode-specific ship instructions as a follow-up message.
