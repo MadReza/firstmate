@@ -384,6 +384,12 @@
 # success line and state/<id>.meta omit them.
 # Every fresh spawn or relaunch records a new spawn_gen= incarnation token so durable
 # consumers can distinguish a replacement worker that reuses the same task id.
+# A fresh Treehouse-backed spawn whose home resolves its own pool root (bin/fm-wake-lib.sh's
+# fm_treehouse_root_for_home; a secondmate home does, a primary home does not) exports that
+# root into the pane before `treehouse get` and records it as treehouse_root=, which
+# bin/fm-teardown.sh passes back into the matching `treehouse return` so the slot goes to the
+# pool it was leased from. Absent means the default pool, and relaunch never recomputes the
+# value: it carries whatever the original lease recorded.
 # When the home session's frozen trace-context decision is enabled (see
 # docs/configuration.md and bin/fm-trace-context-lib.sh), the meta also records
 # one W3C traceparent= carrier, the same value injected into the pane as
