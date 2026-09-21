@@ -7,9 +7,11 @@
 # same origin land in the same pool and `treehouse get` hands back a worktree
 # bound to whichever clone created it first. bin/fm-spawn.sh must export a
 # distinct TREEHOUSE_ROOT into the pane before sending `treehouse get` for a
-# secondmate home, and leave a primary home's pane untouched. This drives the
-# real spawn against a fake pane and asserts the pane-export log
-# (tests/fixtures.sh's FM_FAKE_PANE_LOG), never the source of fm-spawn.sh.
+# secondmate home, and leave a primary home's pane untouched, and it must record
+# the root it leased from in the task record fm-teardown.sh reads back. This
+# drives the real spawn against a fake pane and asserts the pane-export log
+# (tests/fixtures.sh's FM_FAKE_PANE_LOG) and the published state/<id>.meta,
+# never the source of fm-spawn.sh.
 set -u
 
 # shellcheck source=tests/fixtures.sh
@@ -52,6 +54,13 @@ treehouse_root_export_lines() {
   grep -c '^export TREEHOUSE_ROOT=' "$1" || true
 }
 
+# The treehouse_root= this spawn recorded in its own task record, which is what
+# bin/fm-teardown.sh reads back to return the slot to the pool it was leased
+# from. Empty means the record carries no override: the default pool.
+recorded_treehouse_root() {  # <id>
+  sed -n 's/^treehouse_root=//p' "$HOME_DIR/state/$1.meta"
+}
+
 test_primary_home_gets_no_override() {
   local rec out status
   rec=$(make_case primary primary-a1)
@@ -63,6 +72,8 @@ test_primary_home_gets_no_override() {
     || fail "a primary home's pane should never receive a TREEHOUSE_ROOT export, got $(treehouse_root_export_lines "$PANE_LOG")"
   grep -qx 'treehouse get' "$PANE_LOG" \
     || fail "primary-home spawn should still send the bare treehouse get"
+  assert_equals "" "$(recorded_treehouse_root primary-a1)" \
+    "a primary home's task record should carry no Treehouse pool root override"
   pass "a primary home's spawn leaves the pane's Treehouse pool root at the default"
 }
 
@@ -86,6 +97,8 @@ test_secondmate_home_gets_its_own_root() {
     || fail "the pane log is missing the export or the treehouse get line"
   [ "$export_line" -lt "$get_line" ] \
     || fail "the TREEHOUSE_ROOT export must reach the pane before treehouse get is sent (export=$export_line get=$get_line)"
+  assert_equals "$HOME_DIR/state/treehouse-root" "$(recorded_treehouse_root secondmate-a1)" \
+    "the leased pool root must be recorded in the task record for teardown to return the slot to it"
   pass "a secondmate home's spawn exports its own Treehouse pool root before treehouse get"
 }
 

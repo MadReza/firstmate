@@ -1636,9 +1636,9 @@ cleanup_stale_lock_for_safety_check() {
 # Return a worktree/home via `treehouse return --force`, tolerating a transient or
 # stale git index.lock left by a killed crew process. See the script header.
 # The optional 5th argument is the Treehouse pool root that owned the matching
-# `treehouse get` (fm_treehouse_root_for_home); empty means the default pool, so
-# a caller returning the primary's own home or worktree passes nothing and a
-# caller returning a secondmate's worktree passes that secondmate's own root.
+# `treehouse get`, as that spawn recorded it in its own task meta
+# (treehouse_root=); empty means the default pool, which is also what a worktree
+# leased before that field existed correctly gets.
 teardown_treehouse_return() {
   local dir=$1 cd_dir=$2 label=$3 post_cleanup_check=${4:-} root=${5:-}
   local out lock attempt=0 max_retries lock_desc
@@ -1647,7 +1647,7 @@ teardown_treehouse_return() {
 
   # Capture stdout+stderr so non-lock failures stay visible and lock failures can
   # be matched by signature even when the lock file is already gone mid-check.
-  if out=$( ( cd "$cd_dir" && "${th_env[@]}" treehouse return --force "$dir" ) 2>&1 ); then
+  if out=$( ( cd "$cd_dir" && "${th_env[@]+"${th_env[@]}"}" treehouse return --force "$dir" ) 2>&1 ); then
     [ -n "$out" ] && printf '%s\n' "$out"
     return 0
   fi
@@ -1672,7 +1672,7 @@ teardown_treehouse_return() {
     echo "teardown: $label return failed with transient git lock ($lock_desc); waiting ${TREEHOUSE_RETURN_LOCK_RETRY_WAIT_SECS}s and retrying ($attempt/${max_retries})" >&2
     sleep "$TREEHOUSE_RETURN_LOCK_RETRY_WAIT_SECS"
 
-    if out=$( ( cd "$cd_dir" && "${th_env[@]}" treehouse return --force "$dir" ) 2>&1 ); then
+    if out=$( ( cd "$cd_dir" && "${th_env[@]+"${th_env[@]}"}" treehouse return --force "$dir" ) 2>&1 ); then
       [ -n "$out" ] && printf '%s\n' "$out"
       echo "teardown: $label return succeeded on retry; lock cleared on its own" >&2
       return 0
@@ -1699,7 +1699,7 @@ teardown_treehouse_return() {
           return 1
         fi
       fi
-      if out=$( ( cd "$cd_dir" && "${th_env[@]}" treehouse return --force "$dir" ) 2>&1 ); then
+      if out=$( ( cd "$cd_dir" && "${th_env[@]+"${th_env[@]}"}" treehouse return --force "$dir" ) 2>&1 ); then
         [ -n "$out" ] && printf '%s\n' "$out"
         echo "teardown: $label return succeeded after stale-lock cleanup" >&2
         return 0
@@ -3121,7 +3121,7 @@ cleanup_firstmate_home_children() {
           "$child_wt/.opencode/plugins/fm-busy-state.js" \
           "$child_wt/.fm-grok-turnend" "$child_wt/.fm-kimi-turnend"
         if [ -n "$child_proj" ] && [ -d "$child_proj" ] && command -v treehouse >/dev/null 2>&1; then
-          child_treehouse_root=$(fm_treehouse_root_for_home "$home") || child_treehouse_root=
+          child_treehouse_root=$(meta_value "$child_meta" treehouse_root)
           if teardown_treehouse_return "$child_wt" "$child_proj" "child worktree" "" "$child_treehouse_root"; then
             fm_treehouse_slot_owner_release "$child_wt" "$child_id"
           else
@@ -3449,7 +3449,7 @@ elif [ -d "$WT" ] && [ "$KIND" != secondmate ]; then
   if [ "$FORCE" != "--force" ] && [ "$KIND" != scout ] && [ "$KIND" != secondmate ]; then
     post_lock_cleanup_check=validate_worktree_teardown_safety
   fi
-  worktree_treehouse_root=$(fm_treehouse_root_for_home "$FM_HOME") || worktree_treehouse_root=
+  worktree_treehouse_root=$(meta_value "$META" treehouse_root)
   teardown_treehouse_return "$WT" "$PROJ" "worktree" "$post_lock_cleanup_check" "$worktree_treehouse_root" || {
     echo "error: treehouse return failed for worktree $WT; teardown aborted" >&2
     exit 1

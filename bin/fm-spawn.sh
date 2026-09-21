@@ -4482,6 +4482,11 @@ preserve_relaunch_meta() {
   echo "effort=${EFFORT:-default}"
   [ -z "${BUSY_GEN:-}" ] || echo "busy_gen=$BUSY_GEN"
   echo "spawn_gen=$SPAWN_GEN"
+  # The pool root this spawn's `treehouse get` actually leased from, so teardown
+  # returns the slot to that same pool instead of re-deriving one from whatever
+  # the home looks like then. Absent means the default pool. Not owned by
+  # preserve_relaunch_meta, so a relaunch carries the original lease's value.
+  [ -z "${spawn_treehouse_root:-}" ] || echo "treehouse_root=$spawn_treehouse_root"
   # Default-off writes no traceparent= line.
   # backend= is written only for a non-default (non-tmux) backend, so the
   # default path's meta stays byte-identical (absent backend= means tmux;
