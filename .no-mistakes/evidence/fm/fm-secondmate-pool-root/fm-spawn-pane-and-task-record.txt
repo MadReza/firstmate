@@ -1,0 +1,11 @@
+
+===== primary home: what fm-spawn sends into the crewmate pane =====
+1:treehouse get
+----- persisted task record state/primary-a1.meta -----
+(no treehouse_root= line -> teardown returns to the default pool)
+
+===== secondmate home: what fm-spawn sends into the crewmate pane =====
+1:export TREEHOUSE_ROOT='/private/var/folders/jv/ds31twvx6z973hlb71pl0ng40000gn/T/fm-spawn-pane-evidence.cUL2Zf/secondmate/home/state/treehouse-root'
+2:treehouse get
+----- persisted task record state/secondmate-a1.meta -----
+13:treehouse_root=/private/var/folders/jv/ds31twvx6z973hlb71pl0ng40000gn/T/fm-spawn-pane-evidence.cUL2Zf/secondmate/home/state/treehouse-root

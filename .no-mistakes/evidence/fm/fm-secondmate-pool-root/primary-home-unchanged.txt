@@ -1,0 +1,35 @@
+Primary-home spawn, base commit aec043c vs this branch c9b7014 (real bin/fm-spawn.sh, fake pane).
+Per-run temp paths normalized; meta values kept.
+
+--- branch output ---
+--- pane transcript ---
+treehouse get
+export GOTMPDIR=/tmp/fm-primary-a1/gotmp
+export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=primary-a1
+--- published task record (values kept; only per-run temp paths normalized) ---
+window=firstmate:fm-primary-a1
+endpoint_task_id=primary-a1
+worktree=<tmp>/primary/wt
+project=<tmp>/primary/project
+harness=codex
+kind=ship
+mode=no-mistakes
+yolo=off
+tasktmp=/tmp/fm-primary-a1
+model=default
+effort=default
+spawn_gen=s1790032899.43316.28438
+
+--- diff base -> branch ---
+--- /tmp/th-e2e/primary-base.txt	2026-09-21 19:21:37
++++ /tmp/th-e2e/primary-head.txt	2026-09-21 19:21:41
+@@ -15,4 +15,4 @@
+ tasktmp=/tmp/fm-primary-a1
+ model=default
+ effort=default
+-spawn_gen=s1790032895.35140.3002
++spawn_gen=s1790032899.43316.28438
+
+(spawn_gen is <epoch>.<pid>.<random>, so it differs on every spawn; nothing else differs:
+ no TREEHOUSE_ROOT export reaches a primary pane and no treehouse_root= is recorded.)

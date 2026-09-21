@@ -1,0 +1,10 @@
+fm-teardown.sh driven by stock macOS bash 3.2 (the shell where an empty "${arr[@]}" under set -u is an unbound-variable error)
+interpreter seen by the teardown child: 3.2.57(1)-release
+
+$ FM_TEARDOWN_TEST_PATH=/tmp/bash32shim:$PATH bin/fm-test-run.sh tests/fm-teardown.test.sh
+  ok - a primary home's teardown returns the worktree with the default Treehouse pool root
+  ok - a teardown returns the worktree through the pool root its spawn recorded
+  ok - a teardown never re-derives a pool root the lease did not record
+  FM_TEST_END 2026-09-21T23:20:16Z tests/fm-teardown.test.sh exit=0 duration_ms=249566 gate_skip=false
+  FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=249629
+  exit=0

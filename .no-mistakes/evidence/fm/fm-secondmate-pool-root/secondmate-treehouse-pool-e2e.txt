@@ -1,0 +1,32 @@
+
+=== setup: one origin URL, two homes that each cloned it ===
+shared origin URL   : /tmp/th-e2e/run/origin.git
+primary home clone  : /tmp/th-e2e/run/primary-home/projects/demo
+secondmate clone    : /tmp/th-e2e/run/secondmate-home/projects/demo
+
+=== the primary home works first, so the shared pool holds ITS pre-warmed slots ===
+primary leased      : /tmp/th-e2e/run/machine-default-treehouse-root/.treehouse/demo-4552d9/1/demo
+bound to clone      : /private/tmp/th-e2e/run/primary-home/projects/demo/.git
+primary returned it; the slot is now warm and idle in the shared pool
+
+=== BEFORE the fix: the secondmate home shares that pool root ===
+treehouse handed it : /tmp/th-e2e/run/machine-default-treehouse-root/.treehouse/demo-4552d9/1/demo
+bound to clone      : /private/tmp/th-e2e/run/primary-home/projects/demo/.git   <- the PRIMARY's clone
+its own clone is    : /tmp/th-e2e/run/secondmate-home/projects/demo/.git
+fm-spawn trust pre-registration: REFUSED - the spawn aborts, the secondmate is inert
+  error: refusing to pre-register Claude trust: '/private/tmp/th-e2e/run/machine-default-treehouse-root/.treehouse/demo-4552d9/1/demo' is not a worktree of project '/private/tmp/th-e2e/run/secondmate-home/projects/demo'
+
+=== AFTER the fix: fm-wake-lib.sh gives this home its own pool root ===
+root for secondmate : /tmp/th-e2e/run/secondmate-home/state/treehouse-root
+root for primary    : <none - keeps the default pool, unchanged>
+treehouse handed it : /tmp/th-e2e/run/secondmate-home/state/treehouse-root/.treehouse/demo-4552d9/1/demo
+bound to clone      : /private/tmp/th-e2e/run/secondmate-home/projects/demo/.git   <- its OWN clone
+fm-spawn trust pre-registration: OK - the secondmate can dispatch work into a worktree of its own clone
+
+=== the return must reach the pool the slot was leased from ===
+return using the default root (what re-deriving at teardown would do): returned
+return using treehouse_root= as the spawn recorded it: returned
+
+=== the two pools are separate and the primary's is untouched ===
+secondmate pool: /tmp/th-e2e/run/secondmate-home/state/treehouse-root/.treehouse/demo-4552d9/ 
+default pool   : /tmp/th-e2e/run/machine-default-treehouse-root/.treehouse/demo-4552d9/ 
