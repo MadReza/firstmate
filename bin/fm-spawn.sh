@@ -3840,6 +3840,16 @@ if [ "$RELAUNCH" -eq 1 ]; then
   fi
   [ "$KIND" = secondmate ] || validate_spawn_worktree "relaunch" "$T"
 elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ]; then
+  # A secondmate home gets its own Treehouse pool root, so `treehouse get`
+  # binds this pane's worktree to this home's own project clone instead of
+  # whichever clone first created a pool shared by origin URL alone (see
+  # fm_treehouse_root_for_home). Sent before `treehouse get` itself so the
+  # exported value is in effect for that very command; a primary home gets no
+  # override and keeps its existing pool untouched.
+  spawn_treehouse_root=$(fm_treehouse_root_for_home "$FM_HOME") || spawn_treehouse_root=
+  if [ -n "$spawn_treehouse_root" ]; then
+    spawn_send_text_line "$WT_TARGET" "export TREEHOUSE_ROOT=$(shell_quote "$spawn_treehouse_root")"
+  fi
   spawn_send_text_line "$WT_TARGET" 'treehouse get'
 
   # Wait for the treehouse subshell: the pane's cwd moves from the project to the worktree.
